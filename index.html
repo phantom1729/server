@@ -1,355 +1,156 @@
-<!doctype html>
-<html lang="hi">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Ultimate Secure Terminal — pw.live</title>
+<meta charset="UTF-8">
+<title>System Breach</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  :root{
-    --bg:#040507;
-    --panel:#071017;
-    --text:#a8f6b3;
-    --muted:#8b98a6;
-    --ok:#2ee06b;
-    --warn:#ffb020;
-    --err:#ff6b6b;
-    --info:#66b3ff;
-    --debug:#c792ea;
-    --mono: "Courier New", Courier, monospace;
-  }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#000814,#021025);font-family:var(--mono);color:var(--text);-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1100px;margin:28px auto;padding:22px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 12px 48px rgba(0,0,0,0.6)}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  h1{margin:0;font-size:18px;letter-spacing:0.6px}
-  .controls{display:flex;gap:8px;align-items:center}
-  .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:700}
-  .btn.primary{background:linear-gradient(90deg,var(--info),#6ee7b7);color:#001}
-  .panel{margin-top:12px;background:var(--panel);border-radius:10px;padding:12px;min-height:520px;position:relative;overflow:hidden}
-  .console{height:420px;overflow:auto;padding:12px;border-radius:8px;background:rgba(0,0,0,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
-  .line{white-space:pre-wrap;line-height:1.45;font-size:13px;font-family:var(--mono)}
-  .ts{color:var(--muted);margin-right:8px}
-  .tag{display:inline-block;padding:2px 6px;border-radius:6px;font-weight:700;margin-right:8px;font-size:12px}
-  .ok{color:var(--ok)} .info{color:var(--info)} .warn{color:var(--warn)} .err{color:var(--err)} .debug{color:var(--debug)} .muted{color:var(--muted)}
-  .cursor{display:inline-block;width:8px;height:16px;background:var(--text);margin-left:6px;vertical-align:middle;animation:blink 1s steps(2) infinite;border-radius:2px}
-  @keyframes blink{50%{opacity:0}}
-  .ascii{font-size:11px;line-height:1.05;color:rgba(168,246,179,0.14);margin-bottom:8px;white-space:pre}
-  .progress-wrap{display:flex;align-items:center;gap:12px;margin-top:10px}
-  .progress{flex:1;height:10px;background:#080b0f;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.02)}
-  .bar{height:100%;width:0%;background:linear-gradient(90deg,#33ff66,#7ef2a6)}
-  .status{min-width:240px;color:var(--muted);font-size:13px}
-  .footer{margin-top:10px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
-  .controls small{color:var(--muted);display:block;font-size:12px;margin-top:4px}
-  .badge{background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:8px;color:var(--muted);font-size:13px;border:1px solid rgba(255,255,255,0.02)}
-  /* colored bullets */
-  .bullet{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
-  .b-ok{background:var(--ok)} .b-info{background:var(--info)} .b-warn{background:var(--warn)} .b-err{background:var(--err)} .b-debug{background:var(--debug)}
-  /* scroll area nice */
-  .console::-webkit-scrollbar{height:8px;width:8px}
-  .console::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.04);border-radius:6px}
-  .controls .small-muted{font-size:12px;color:var(--muted)}
-  /* final overlay */
-  .overlay{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.45));backdrop-filter: blur(0px);pointer-events:none}
-  .final-msg{padding:18px;border-radius:12px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03);color:var(--err);font-weight:800;display:none}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+background:black;
+color:#00ff00;
+font-family:monospace;
+overflow:hidden;
+}
+#matrix{position:fixed;inset:0;z-index:-1;opacity:.35}
+#terminal{padding:15px;height:100vh;overflow:auto;font-size:14px;line-height:1.4}
+.warning{color:red;font-size:22px;text-align:center;margin:20px}
+.popup{
+position:fixed;inset:0;
+background:rgba(0,0,0,.95);
+display:flex;align-items:center;justify-content:center;
+flex-direction:column;
+color:white;
+z-index:999;
+font-size:20px;
+}
+.shake{animation:shake .1s infinite}
+@keyframes shake{
+0%{transform:translate(0)}
+25%{transform:translate(5px)}
+50%{transform:translate(-5px)}
+75%{transform:translate(5px)}
+100%{transform:translate(0)}
+}
+.led{
+position:fixed;
+top:8px;right:12px;
+width:12px;height:12px;
+border-radius:50%;
+background:red;
+animation:blink 1s infinite;
+z-index:1000;
+}
+@keyframes blink{50%{opacity:.1}}
+.hidden{display:none}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Ultimate Secure Terminal — pw.live</h1>
-      <div class="controls">
-        <button id="startBtn" class="btn primary">Start</button>
-        <button id="stopBtn" class="btn">Stop</button>
-        <button id="saveBtn" class="btn">Save Logs</button>
-        <div class="badge">Session: <span id="sessId" class="muted"></span></div>
-      </div>
-    </header>
 
-    <div class="panel" role="region" aria-label="terminal">
-      <div class="ascii" id="asciiArt">
-+---------------------------------------------------------------------------------+
-|   ____  _   _ _   _  _   _  _   _  _   _       ULTIMATE SECURE tunnel  v3.7     |
-|  / ___|| | | | \\ | || \\ | || \\ | || \\ | |                             __    |
-|  \\___ \\| | | |  \\| ||  \\| ||  \\| ||  \\| |         retrieval engine / /    |
-|   ___) | |_| | |\\  || |\\  || |\\  || |\\  |   Real-time logs · dynamic hex IDs \\ \\   |
-|  |____/ \\___/|_| \\_||_| \\_||_| \\_||_| \\_|                            \\_\\  |
-+---------------------------------------------------------------------------------+
-      </div>
+<canvas id="matrix"></canvas>
+<div class="led"></div>
+<div id="terminal"></div>
 
-      <div class="console" id="console" aria-live="polite" role="log"></div>
-
-      <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
-        <div class="progress-wrap" style="flex:1">
-          <div class="progress"><div id="bar" class="bar"></div></div>
-        </div>
-        <div class="status"><span class="bullet b-info"></span><span id="pct">0%</span> · <span id="statusText" class="muted">idle</span></div>
-      </div>
-
-      <div class="overlay"><div id="finalMsg" class="final-msg">Failed to retrieve — your device is not powerful enough</div></div>
-    </div>
-
-    <div class="footer">
-      <div class="muted">Simulated kernel v4.19 · connected to local network</div>
-      <div class="muted">Tip: Use Start / Stop. Logs auto-rotate and can be saved.</div>
-    </div>
-  </div>
+<audio id="click" src="https://actions.google.com/sounds/v1/camera/camera_shutter_click_01.mp3"></audio>
+<audio id="ring" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"></audio>
 
 <script>
-/*
-  Ultimate Secure Terminal — pw.live
-  - Start runs continuous dynamic logs for a long feel ( ~2 hours if left )
-  - Stop pauses generation
-  - Save Logs downloads captured JSON
-  - Absolutely local-only; no real network or hacking performed
-*/
+// MATRIX
+const c=document.getElementById("matrix"),x=c.getContext("2d");
+c.width=innerWidth;c.height=innerHeight;
+let letters="01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let font=16,cols=c.width/font;
+let drops=Array(Math.floor(cols)).fill(1);
+setInterval(()=>{
+x.fillStyle="rgba(0,0,0,.05)";
+x.fillRect(0,0,c.width,c.height);
+x.fillStyle="#0f0";
+x.font=font+"px monospace";
+drops.forEach((y,i)=>{
+let t=letters[Math.floor(Math.random()*letters.length)];
+x.fillText(t,i*font,y*font);
+if(y*font>c.height&&Math.random()>.98)drops[i]=0;
+drops[i]++;
+});
+},33);
 
-(function(){
-  // config
-  const TOTAL_RUN_MS = 2 * 60 * 60 * 1000; // 2 hours feel (progress scaling)
-  const LINES_TO_GENERATE = 2000; // many lines over time
-  const SAVE_INTERVAL_MS = 5 * 60 * 1000; // auto-save every 5 min
-  const consoleEl = document.getElementById('console');
-  const barEl = document.getElementById('bar');
-  const pctEl = document.getElementById('pct');
-  const statusEl = document.getElementById('statusText');
-  const finalOverlay = document.getElementById('finalMsg');
-  const sessIdEl = document.getElementById('sessId');
+// TERMINAL
+const t=document.getElementById("terminal");
+const logs=[
+"> Connecting to device...",
+"> Camera permission GRANTED",
+"> Screenshot captured",
+"> GPS Locked: 28.6139° N , 77.2090° E",
+"> WhatsApp service hijacked",
+"> Incoming remote command...",
+"> Nearby device connected",
+"> Battery critical: 1%",
+"> CYBER CELL TRACE ENABLED",
+"> DATA WIPE IN 10 SECONDS"
+];
 
-  // UI
-  const startBtn = document.getElementById('startBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const saveBtn = document.getElementById('saveBtn');
+let i=0;
+function log(){
+if(i<logs.length){
+t.innerHTML+=logs[i++]+"<br>";
+t.scrollTop=t.scrollHeight;
+if(i==2)document.getElementById("click").play();
+if(i==5)document.getElementById("ring").play();
+setTimeout(log,900);
+}else sequence();
+}
+setTimeout(log,1000);
 
-  // state
-  let running = false;
-  let generated = 0;
-  let startTime = null;
-  let timers = [];
-  let captured = [];
-  let sessionId = randomHex(10);
-  sessIdEl.textContent = sessionId;
+// SEQUENCE
+function sequence(){
+navigator.vibrate?.([200,100,200,100,200]);
+document.body.classList.add("shake");
 
-  // log types + weights
-  const LOG_TYPES = [
-    {tag:"INFO", cls:"info", weight:40},
-    {tag:"OK", cls:"ok", weight:25},
-    {tag:"DEBUG", cls:"debug", weight:12},
-    {tag:"WARN", cls:"warn", weight:14},
-    {tag:"ERROR", cls:"err", weight:9}
-  ];
+popup("📸 Screenshot Captured",1500,()=>{
+popup("📞 Fake WhatsApp Incoming Call",2000,()=>{
+popup("🔐 Lock Screen Compromised",2000,()=>{
+popup("🚓 CYBER CELL NOTICE\nIP TRACKED",2500,()=>{
+countdown(10);
+});
+});
+});
+});
+}
 
-  const LORE = [
-    "scanning for endpoints", "allocating buffer", "mapping cluster table",
-    "decrypting block", "verifying signature", "fetching remote chunk",
-    "rebuilding index", "optimizing pipeline", "resuming interrupted stream",
-    "resolving dependencies", "performing deep integrity check", "simulating parity rebuild"
-  ];
+// POPUP
+function popup(text,time,cb){
+let p=document.createElement("div");
+p.className="popup";
+p.innerText=text;
+document.body.appendChild(p);
+setTimeout(()=>{p.remove();cb&&cb();},time);
+}
 
-  // helper functions
-  function nowTS(){ return new Date().toLocaleTimeString(); }
-  function randomHex(len){ const ch="abcdef0123456789"; let s=""; for(let i=0;i<len;i++) s+=ch[Math.floor(Math.random()*ch.length)]; return s; }
-  function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-  function pickWeighted(arr){
-    const total = arr.reduce((s,o)=>s+o.weight,0);
-    let r = Math.random()*total;
-    for(let o of arr){ if(r < o.weight) return o; r -= o.weight; }
-    return arr[0];
-  }
+// COUNTDOWN
+function countdown(n){
+let p=document.createElement("div");
+p.className="popup";
+document.body.appendChild(p);
+let i=n;
+let int=setInterval(()=>{
+p.innerText="🧨 DATA WIPE IN "+i+"s";
+i--;
+if(i<0){
+clearInterval(int);
+selfDestruct();
+}
+},1000);
+}
 
-  function appendLine(obj){
-    // obj: {type, msg, meta}
-    const line = document.createElement('div');
-    line.className = 'line';
-    const ts = `<span class="ts">[${nowTS()}]</span>`;
-    const tag = `<span class="tag ${obj.type.cls}">${obj.type.tag}</span>`;
-    const meta = obj.meta ? `<span class="muted"> ${obj.meta}</span>` : '';
-    line.innerHTML = ts + tag + obj.msg + meta;
-    consoleEl.appendChild(line);
-    // keep console to last ~1500 lines for performance
-    while(consoleEl.children.length > 1500) consoleEl.removeChild(consoleEl.firstChild);
-    consoleEl.scrollTop = consoleEl.scrollHeight;
-    // capture for save
-    captured.push({t:Date.now(), s:obj.type.tag, m:obj.msg, meta:obj.meta});
-  }
-
-  function genRandomLine(){
-    const type = pickWeighted(LOG_TYPES);
-    // sometimes verbose hex stream or ascii block
-    if(Math.random() < 0.06){
-      // hex dump like line
-      const hexs = [];
-      for(let k=0;k<8;k++) hexs.push(randomHex(8));
-      return {type, msg: "HEXDUMP " + hexs.join(" ") , meta: "id:"+randomHex(6)};
-    }
-    if(Math.random() < 0.03){
-      // base64 or token
-      return {type, msg: "TOKEN " + btoa(randomHex(12)).slice(0,24), meta: "sess:"+sessionId};
-    }
-    // error cluster occasionally
-    if(type.tag === "ERROR" || Math.random()<0.08){
-      const errMsg = ["segment missing","checksum mismatch","i/o timeout","permission denied","memory allocation failed","module crashed"][randInt(0,5)];
-      return {type, msg: `[${errMsg}] auto-fix attempt scheduled`, meta: "err:"+randomHex(5)};
-    }
-    // normal log
-    const action = LORE[randInt(0, LORE.length-1)];
-    const payload = `${action} · id:${randomHex(6)} · ${randInt(20,9999)} items`;
-    return {type, msg: payload, meta: null};
-  }
-
-  // typing effect (optional) - faster for many lines
-  function pushGeneratedLines(count){
-    for(let n=0;n<count;n++){
-      const obj = genRandomLine();
-      appendLine(obj);
-      generated++;
-    }
-  }
-
-  // progressive schedule to simulate long duration:
-  // we will produce LINES_TO_GENERATE across TOTAL_RUN_MS; but also random bursts and quiet times
-  function scheduleGeneration(){
-    if(!running) return;
-    const elapsed = Date.now() - startTime;
-    // progress percent based on elapsed/TOTAL_RUN_MS (cap at 98 until final)
-    let progress = Math.min(98, Math.floor((elapsed / TOTAL_RUN_MS) * 100));
-    barEl.style.width = progress + "%";
-    pctEl.textContent = progress + "%";
-    statusEl.textContent = ["busy","analyzing","decrypting","optimizing","resolving"][randInt(0,4)];
-
-    // produce dynamic number of lines per tick (0..6) biased by elapsed
-    const base = 1 + Math.floor( (elapsed / TOTAL_RUN_MS) * 6 );
-    const burst = randInt(0, base+3);
-    pushGeneratedLines(burst);
-
-    // schedule next tick with jitter (fast ticks more frequent early, slower later)
-    const nextMs = 200 + Math.random()*1200; // between 200ms and 1.4s
-    const t = setTimeout(scheduleGeneration, nextMs);
-    timers.push(t);
-
-    // occasional deep-check long sequence
-    if(Math.random() < 0.02){
-      deepIntegrityCheck();
-    }
-
-    // auto-stop condition: if we've generated enough lines (safety)
-    if(generated >= LINES_TO_GENERATE) {
-      // start finalization sequence
-      finalizeSequence();
-    }
-  }
-
-  function deepIntegrityCheck(){
-    const chunks = randInt(4,9);
-    appendLine({type:pickWeighted(LOG_TYPES), msg:"Performing deep integrity check ...", meta:null});
-    let c=0;
-    function step(){
-      if(!running) return;
-      appendLine({type:pickWeighted(LOG_TYPES), msg:`deep-check: scanned chunk ${randInt(100,999)} / approx ${randInt(1000,9000)}`, meta:`cid:${randomHex(4)}`});
-      c++;
-      if(c<chunks) setTimeout(step, 1200 + Math.random()*2200);
-    }
-    step();
-  }
-
-  function finalizeSequence(){
-    if(!running) return;
-    running = false; // pause main generation
-    statusEl.textContent = "finalizing";
-    // finish progress slowly to 100%
-    let p = parseFloat(barEl.style.width) || 0;
-    const fin = setInterval(()=>{
-      p = p + 0.05 + Math.random()*0.2;
-      barEl.style.width = Math.min(100,p) + "%";
-      pctEl.textContent = Math.floor(Math.min(100,p)) + "%";
-      appendLine({type:pickWeighted(LOG_TYPES), msg:"Finalizing results and preparing package for upload...", meta:null});
-      if(p >= 99.9){
-        clearInterval(fin);
-        // failure message intentionally
-        appendLine({type:{tag:"ERROR",cls:"err"}, msg:"Status: Upload failed during finalization phase.", meta:null});
-        setTimeout(()=>{
-          appendLine({type:{tag:"ERROR",cls:"err"}, msg:"Failed to retrieve from remote backup. Your device is not powerful enough to complete retrieval.", meta:null});
-          // show overlay final message
-          finalOverlayShow();
-        },800);
-      }
-    }, 800);
-  }
-
-  function finalOverlayShow(){
-    finalOverlay.style.display = "block";
-    finalOverlay.style.pointerEvents = "auto";
-    document.getElementById('finalMsg').style.display = "block";
-  }
-
-  // start / stop / save
-  function startEverything(){
-    if(running) return;
-    running = true;
-    startTime = Date.now();
-    statusEl.textContent = "starting";
-    // small warm-up
-    appendLine({type:{tag:"INFO",cls:"info"}, msg:`session ${sessionId} starting — simulating long retrieval`, meta:null});
-    scheduleGeneration();
-  }
-
-  function stopEverything(){
-    running = false;
-    // clear timers
-    while(timers.length) clearTimeout(timers.pop());
-    appendLine({type:{tag:"WARN",cls:"warn"}, msg:"pw.live paused by user.", meta:null});
-    statusEl.textContent = "paused";
-  }
-
-  function saveLogs(){
-    if(captured.length === 0){
-      alert("No logs captured yet.");
-      return;
-    }
-    const data = JSON.stringify({session:sessionId, startedAt:startTime, captured}, null, 2);
-    const blob = new Blob([data], {type:"application/json"});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `terminal_logs_${sessionId}.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  // attach UI
-  startBtn.addEventListener('click', startEverything);
-  stopBtn.addEventListener('click', stopEverything);
-  saveBtn.addEventListener('click', saveLogs);
-
-  // nice auto-save every interval (non intrusive)
-  const autosaveId = setInterval(()=>{
-    if(captured.length>0){
-      // keep last autosave small (not to spam downloads) -> store in localStorage for quick restore
-      try {
-        localStorage.setItem('term_sim_'+sessionId, JSON.stringify({t:Date.now(), captured: captured.slice(-2000)}));
-        appendLine({type:{tag:"INFO",cls:"info"}, msg:"Autosaved recent logs to localStorage", meta:null});
-      } catch(e){
-        appendLine({type:{tag:"WARN",cls:"warn"}, msg:"Autosave failed (storage quota?)", meta:null});
-      }
-    }
-  }, SAVE_INTERVAL_MS);
-
-  // keyboard shortcuts
-  window.addEventListener('keydown', (e)=>{
-    if(e.key === 'S' && (e.ctrlKey || e.metaKey)){
-      e.preventDefault(); saveLogs();
-    }
-    if(e.key === 'P' && (e.ctrlKey || e.metaKey)){
-      e.preventDefault();
-      if(running) stopEverything(); else startEverything();
-    }
-  });
-
-  // initial welcome lines
-  appendLine({type:{tag:"INFO",cls:"info"}, msg:"Secure Terminal pw.live ready", meta:`session:${sessionId}`});
-  appendLine({type:{tag:"DEBUG",cls:"debug"}, msg:"Press Start to begin extended pw.live (Ctrl+P to toggle).", meta:null});
-
-  // small safety: if user leaves open too long, avoid infinite DOM growth (we limit captured array size)
-  const trimInterval = setInterval(()=>{ if(captured.length>5000) captured = captured.slice(-4000); }, 60*1000);
-
-})();
+// FINAL
+function selfDestruct(){
+document.body.innerHTML="";
+document.body.style.background="black";
+setTimeout(()=>{
+document.body.innerHTML="<h1 style='color:red;text-align:center;margin-top:40vh'>CONNECTION TERMINATED</h1>";
+},800);
+}
 </script>
+
 </body>
 </html>
