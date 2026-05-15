@@ -1,152 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PW Server Scanner</title>
 
 <style>
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:Consolas, monospace;
 }
 
 body{
-    background:#0f172a;
+    background:#020617;
     overflow:hidden;
+    color:#00ff88;
+    height:100vh;
+}
+
+/* MATRIX BG */
+
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:-1;
+}
+
+/* MAIN */
+
+.container{
+    width:100%;
     height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    color:white;
+    flex-direction:column;
+    padding:20px;
 }
 
-.background{
-    position:absolute;
-    width:100%;
-    height:100%;
-    background:
-    radial-gradient(circle at top left,#5b21b6 0%,transparent 35%),
-    radial-gradient(circle at bottom right,#7c3aed 0%,transparent 35%),
-    #0f172a;
-    z-index:-1;
-}
-
-.container{
-    width:90%;
-    max-width:1100px;
-}
-
-.logo{
-    text-align:center;
-    font-size:50px;
-    font-weight:bold;
+.title{
+    font-size:48px;
+    color:#ffd500;
+    text-shadow:0 0 20px #ffd500;
     margin-bottom:40px;
-    letter-spacing:3px;
-    color:#facc15;
-    text-shadow:0 0 20px rgba(250,204,21,0.8);
-    animation:pulse 2s infinite;
+    letter-spacing:4px;
+    animation:flicker 2s infinite;
 }
 
-@keyframes pulse{
-    0%{transform:scale(1);}
-    50%{transform:scale(1.05);}
-    100%{transform:scale(1);}
+@keyframes flicker{
+    0%,100%{opacity:1;}
+    50%{opacity:0.8;}
 }
 
-.servers{
+/* SERVER BOX */
+
+.server-area{
+    width:100%;
+    max-width:1200px;
     display:flex;
-    gap:25px;
     justify-content:center;
+    gap:25px;
     flex-wrap:wrap;
 }
 
 .server{
-    width:300px;
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.1);
-    backdrop-filter:blur(10px);
-    border-radius:20px;
-    padding:25px;
-    position:relative;
+    width:340px;
+    height:420px;
+    background:rgba(0,255,120,0.05);
+    border:1px solid rgba(0,255,120,0.3);
+    border-radius:18px;
+    backdrop-filter:blur(8px);
     overflow:hidden;
-    box-shadow:0 0 25px rgba(124,58,237,0.3);
+    position:relative;
+    box-shadow:
+    0 0 25px rgba(0,255,120,0.2),
+    inset 0 0 15px rgba(0,255,120,0.1);
 }
 
-.server::before{
-    content:'';
+/* SCAN LINE */
+
+.scan{
     position:absolute;
     top:-100%;
-    left:-40%;
-    width:80px;
-    height:300%;
-    background:rgba(255,255,255,0.15);
-    transform:rotate(25deg);
-    animation:shine 4s linear infinite;
+    left:0;
+    width:100%;
+    height:100px;
+    background:linear-gradient(
+        to bottom,
+        transparent,
+        rgba(0,255,120,0.35),
+        transparent
+    );
+    animation:scan 3s linear infinite;
 }
 
-@keyframes shine{
+@keyframes scan{
     100%{
-        left:140%;
+        top:120%;
     }
 }
 
-.server h2{
+.server-header{
+    padding:18px;
     text-align:center;
-    margin-bottom:20px;
-    color:#c084fc;
+    font-size:24px;
+    color:#00ff88;
+    border-bottom:1px solid rgba(0,255,120,0.2);
+    background:rgba(0,255,120,0.05);
 }
 
-.status{
-    margin-top:15px;
-    font-size:14px;
-    color:#d1d5db;
-    height:20px;
-}
-
-.progress{
-    width:100%;
-    height:12px;
-    background:#1e293b;
-    border-radius:20px;
+.logs{
+    height:300px;
     overflow:hidden;
-    margin-top:15px;
+    padding:15px;
+    font-size:13px;
+    line-height:1.8;
 }
 
-.bar{
-    width:0%;
-    height:100%;
-    background:linear-gradient(90deg,#7c3aed,#facc15);
-    border-radius:20px;
-    animation:loading 3s infinite;
+.log{
+    opacity:0;
+    animation:fade 0.5s forwards;
 }
 
-@keyframes loading{
-    0%{width:0%;}
-    50%{width:90%;}
-    100%{width:0%;}
+@keyframes fade{
+    to{
+        opacity:1;
+    }
 }
+
+/* LOADER */
 
 .loader{
-    margin-top:18px;
     display:flex;
     justify-content:center;
     gap:8px;
+    margin-top:10px;
 }
 
 .dot{
-    width:12px;
-    height:12px;
+    width:10px;
+    height:10px;
     border-radius:50%;
-    background:#facc15;
+    background:#00ff88;
     animation:bounce 1s infinite;
 }
 
 .dot:nth-child(2){
     animation-delay:0.2s;
 }
+
 .dot:nth-child(3){
     animation-delay:0.4s;
 }
@@ -154,7 +160,7 @@ body{
 @keyframes bounce{
     0%,100%{
         transform:translateY(0);
-        opacity:0.4;
+        opacity:0.3;
     }
     50%{
         transform:translateY(-10px);
@@ -162,59 +168,49 @@ body{
     }
 }
 
-.refresh-btn{
-    display:block;
-    margin:45px auto 0;
-    padding:15px 40px;
+/* BUTTON */
+
+.refresh{
+    margin-top:40px;
+    padding:16px 45px;
+    background:#00ff88;
     border:none;
     border-radius:50px;
-    background:linear-gradient(90deg,#7c3aed,#facc15);
-    color:white;
+    color:black;
     font-size:18px;
     font-weight:bold;
     cursor:pointer;
     transition:0.3s;
-    box-shadow:0 0 20px rgba(124,58,237,0.5);
+    box-shadow:0 0 25px rgba(0,255,120,0.5);
 }
 
-.refresh-btn:hover{
+.refresh:hover{
     transform:scale(1.08);
 }
 
-.scan-line{
-    position:absolute;
-    width:100%;
-    height:3px;
-    background:linear-gradient(90deg,transparent,#22d3ee,transparent);
-    top:0;
-    left:0;
-    animation:scan 2s linear infinite;
+.status{
+    text-align:center;
+    margin-top:10px;
+    color:#ffd500;
+    font-size:14px;
 }
 
-@keyframes scan{
-    0%{top:0;}
-    100%{top:100%;}
-}
 </style>
 </head>
-
 <body>
 
-<div class="background"></div>
+<canvas id="matrix"></canvas>
 
 <div class="container">
 
-    <div class="logo">PW SERVER SCANNER</div>
+    <div class="title">PW DARK SERVER ACCESS</div>
 
-    <div class="servers">
+    <div class="server-area">
 
         <div class="server">
-            <div class="scan-line"></div>
-            <h2>Server 01</h2>
-
-            <div class="progress">
-                <div class="bar"></div>
-            </div>
+            <div class="scan"></div>
+            <div class="server-header">SERVER 01</div>
+            <div class="logs" id="logs1"></div>
 
             <div class="loader">
                 <div class="dot"></div>
@@ -222,18 +218,13 @@ body{
                 <div class="dot"></div>
             </div>
 
-            <div class="status" id="status1">
-                Searching upload status...
-            </div>
+            <div class="status">WAITING FOR RESPONSE...</div>
         </div>
 
         <div class="server">
-            <div class="scan-line"></div>
-            <h2>Server 02</h2>
-
-            <div class="progress">
-                <div class="bar"></div>
-            </div>
+            <div class="scan"></div>
+            <div class="server-header">SERVER 02</div>
+            <div class="logs" id="logs2"></div>
 
             <div class="loader">
                 <div class="dot"></div>
@@ -241,18 +232,13 @@ body{
                 <div class="dot"></div>
             </div>
 
-            <div class="status" id="status2">
-                Checking data...
-            </div>
+            <div class="status">SEARCHING FILES...</div>
         </div>
 
         <div class="server">
-            <div class="scan-line"></div>
-            <h2>Server 03</h2>
-
-            <div class="progress">
-                <div class="bar"></div>
-            </div>
+            <div class="scan"></div>
+            <div class="server-header">SERVER 03</div>
+            <div class="logs" id="logs3"></div>
 
             <div class="loader">
                 <div class="dot"></div>
@@ -260,14 +246,12 @@ body{
                 <div class="dot"></div>
             </div>
 
-            <div class="status" id="status3">
-                Waiting for upload...
-            </div>
+            <div class="status">CONNECTING...</div>
         </div>
 
     </div>
 
-    <button class="refresh-btn" onclick="refreshServers()">
+    <button class="refresh" onclick="restartLogs()">
         REFRESH SERVERS
     </button>
 
@@ -275,43 +259,109 @@ body{
 
 <script>
 
-const messages = [
-    "Searching upload status...",
-    "Still not uploaded...",
-    "Checking server response...",
-    "Loading latest data...",
-    "Scanning files...",
-    "Upload not detected...",
-    "Retrying connection...",
-    "Refreshing server...",
-    "Verifying update..."
+/* MATRIX EFFECT */
+
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+
+const drops = [];
+
+for(let x=0;x<columns;x++){
+    drops[x]=1;
+}
+
+function drawMatrix(){
+
+    ctx.fillStyle="rgba(2,6,23,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle="#00ff88";
+    ctx.font=fontSize+"px monospace";
+
+    for(let i=0;i<drops.length;i++){
+
+        const text = letters.charAt(
+            Math.floor(Math.random()*letters.length)
+        );
+
+        ctx.fillText(
+            text,
+            i*fontSize,
+            drops[i]*fontSize
+        );
+
+        if(
+            drops[i]*fontSize > canvas.height &&
+            Math.random()>0.975
+        ){
+            drops[i]=0;
+        }
+
+        drops[i]++;
+    }
+}
+
+setInterval(drawMatrix,35);
+
+/* SERVER LOGS */
+
+const logs = [
+    "[+] Connecting to PW secure server...",
+    "[+] Changing proxy route...",
+    "[+] Server changed successfully...",
+    "[+] Starting uploaded file search...",
+    "[+] Extracting source code...",
+    "[+] Checking hidden uploads...",
+    "[+] Access token generated...",
+    "[+] Searching latest upload...",
+    "[+] File hash matched...",
+    "[+] Retry request sending...",
+    "[+] Waiting for upload response...",
+    "[!] Upload not detected...",
+    "[!] Uploaded file not found...",
+    "[!] Rechecking server database...",
+    "[+] Scanning encrypted folders...",
+    "[+] Searching backup servers...",
+    "[!] No uploaded content available..."
 ];
 
-function randomMessage(){
-    return messages[Math.floor(Math.random()*messages.length)];
+function addLog(id){
+
+    const box = document.getElementById(id);
+
+    const div = document.createElement("div");
+    div.className = "log";
+
+    div.innerText =
+        logs[Math.floor(Math.random()*logs.length)];
+
+    box.appendChild(div);
+
+    if(box.children.length > 14){
+        box.removeChild(box.children[0]);
+    }
+
+    box.scrollTop = box.scrollHeight;
 }
 
-function updateStatuses(){
-    document.getElementById("status1").innerText = randomMessage();
-    document.getElementById("status2").innerText = randomMessage();
-    document.getElementById("status3").innerText = randomMessage();
-}
+setInterval(()=>{
+    addLog("logs1");
+    addLog("logs2");
+    addLog("logs3");
+},1200);
 
-setInterval(updateStatuses,2000);
+function restartLogs(){
 
-function refreshServers(){
-
-    const btn = document.querySelector(".refresh-btn");
-
-    btn.innerText = "REFRESHING...";
-    btn.style.opacity = "0.7";
-
-    updateStatuses();
-
-    setTimeout(()=>{
-        btn.innerText = "REFRESH SERVERS";
-        btn.style.opacity = "1";
-    },2000);
+    document.getElementById("logs1").innerHTML="";
+    document.getElementById("logs2").innerHTML="";
+    document.getElementById("logs3").innerHTML="";
 }
 
 </script>
