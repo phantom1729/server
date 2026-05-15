@@ -1,370 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PW Server Scanner</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PW Server Hack Terminal</title>
+    <style>
+        body {
+            background-color: #050505;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-<style>
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00ff00;
+            letter-spacing: 2px;
+        }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Consolas, monospace;
-}
+        .servers-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
 
-body{
-    background:#020617;
-    overflow:hidden;
-    color:#00ff88;
-    height:100vh;
-}
+        .server-box {
+            flex: 1;
+            border: 1px solid #00ff00;
+            padding: 10px;
+            text-align: center;
+            background: rgba(0, 255, 0, 0.05);
+            box-shadow: 0 0 5px #00ff00;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
 
-/* MATRIX BG */
+        .terminal {
+            width: 100%;
+            max-width: 800px;
+            flex: 1;
+            border: 2px solid #00ff00;
+            background-color: #000;
+            padding: 15px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.5);
+            box-sizing: border-box;
+        }
 
-canvas{
-    position:fixed;
-    top:0;
-    left:0;
-    z-index:-1;
-}
+        .terminal p {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
 
-/* MAIN */
+        .controls {
+            margin-top: 20px;
+        }
 
-.container{
-    width:100%;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    padding:20px;
-}
+        button {
+            background-color: transparent;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 10px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-shadow: 0 0 5px #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            transition: all 0.2s;
+        }
 
-.title{
-    font-size:48px;
-    color:#ffd500;
-    text-shadow:0 0 20px #ffd500;
-    margin-bottom:40px;
-    letter-spacing:4px;
-    animation:flicker 2s infinite;
-}
+        button:hover {
+            background-color: #00ff00;
+            color: #000;
+        }
 
-@keyframes flicker{
-    0%,100%{opacity:1;}
-    50%{opacity:0.8;}
-}
+        button:disabled {
+            border-color: #555;
+            color: #555;
+            text-shadow: none;
+            box-shadow: none;
+            cursor: not-allowed;
+            background-color: transparent;
+        }
 
-/* SERVER BOX */
-
-.server-area{
-    width:100%;
-    max-width:1200px;
-    display:flex;
-    justify-content:center;
-    gap:25px;
-    flex-wrap:wrap;
-}
-
-.server{
-    width:340px;
-    height:420px;
-    background:rgba(0,255,120,0.05);
-    border:1px solid rgba(0,255,120,0.3);
-    border-radius:18px;
-    backdrop-filter:blur(8px);
-    overflow:hidden;
-    position:relative;
-    box-shadow:
-    0 0 25px rgba(0,255,120,0.2),
-    inset 0 0 15px rgba(0,255,120,0.1);
-}
-
-/* SCAN LINE */
-
-.scan{
-    position:absolute;
-    top:-100%;
-    left:0;
-    width:100%;
-    height:100px;
-    background:linear-gradient(
-        to bottom,
-        transparent,
-        rgba(0,255,120,0.35),
-        transparent
-    );
-    animation:scan 3s linear infinite;
-}
-
-@keyframes scan{
-    100%{
-        top:120%;
-    }
-}
-
-.server-header{
-    padding:18px;
-    text-align:center;
-    font-size:24px;
-    color:#00ff88;
-    border-bottom:1px solid rgba(0,255,120,0.2);
-    background:rgba(0,255,120,0.05);
-}
-
-.logs{
-    height:300px;
-    overflow:hidden;
-    padding:15px;
-    font-size:13px;
-    line-height:1.8;
-}
-
-.log{
-    opacity:0;
-    animation:fade 0.5s forwards;
-}
-
-@keyframes fade{
-    to{
-        opacity:1;
-    }
-}
-
-/* LOADER */
-
-.loader{
-    display:flex;
-    justify-content:center;
-    gap:8px;
-    margin-top:10px;
-}
-
-.dot{
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:#00ff88;
-    animation:bounce 1s infinite;
-}
-
-.dot:nth-child(2){
-    animation-delay:0.2s;
-}
-
-.dot:nth-child(3){
-    animation-delay:0.4s;
-}
-
-@keyframes bounce{
-    0%,100%{
-        transform:translateY(0);
-        opacity:0.3;
-    }
-    50%{
-        transform:translateY(-10px);
-        opacity:1;
-    }
-}
-
-/* BUTTON */
-
-.refresh{
-    margin-top:40px;
-    padding:16px 45px;
-    background:#00ff88;
-    border:none;
-    border-radius:50px;
-    color:black;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.3s;
-    box-shadow:0 0 25px rgba(0,255,120,0.5);
-}
-
-.refresh:hover{
-    transform:scale(1.08);
-}
-
-.status{
-    text-align:center;
-    margin-top:10px;
-    color:#ffd500;
-    font-size:14px;
-}
-
-</style>
+        /* Custom Scrollbar for terminal */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00ff00; 
+        }
+    </style>
 </head>
 <body>
 
-<canvas id="matrix"></canvas>
+    <div class="header">SYSTEM BREACH: PW DATABASE TARGETED</div>
 
-<div class="container">
-
-    <div class="title">PW DARK SERVER ACCESS</div>
-
-    <div class="server-area">
-
-        <div class="server">
-            <div class="scan"></div>
-            <div class="server-header">SERVER 01</div>
-            <div class="logs" id="logs1"></div>
-
-            <div class="loader">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-
-            <div class="status">WAITING FOR RESPONSE...</div>
-        </div>
-
-        <div class="server">
-            <div class="scan"></div>
-            <div class="server-header">SERVER 02</div>
-            <div class="logs" id="logs2"></div>
-
-            <div class="loader">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-
-            <div class="status">SEARCHING FILES...</div>
-        </div>
-
-        <div class="server">
-            <div class="scan"></div>
-            <div class="server-header">SERVER 03</div>
-            <div class="logs" id="logs3"></div>
-
-            <div class="loader">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-
-            <div class="status">CONNECTING...</div>
-        </div>
-
+    <div class="servers-container">
+        <div id="srv1" class="server-box">SERVER 01: IDLE</div>
+        <div id="srv2" class="server-box">SERVER 02: IDLE</div>
+        <div id="srv3" class="server-box">SERVER 03: IDLE</div>
     </div>
 
-    <button class="refresh" onclick="restartLogs()">
-        REFRESH SERVERS
-    </button>
+    <div class="terminal" id="terminal-output">
+        <p>> System ready. Waiting for user command...</p>
+    </div>
 
-</div>
+    <div class="controls">
+        <button id="hack-btn" onclick="initiateHack()">[ INITIATE SEARCH PROTOCOL ]</button>
+    </div>
 
-<script>
+    <script>
+        const terminal = document.getElementById('terminal-output');
+        const hackBtn = document.getElementById('hack-btn');
 
-/* MATRIX EFFECT */
+        // Utility function to wait
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
+        // Servers details
+        const servers = [
+            { id: 'srv1', name: 'PW_NODE_ALPHA' },
+            { id: 'srv2', name: 'PW_NODE_BETA' },
+            { id: 'srv3', name: 'PW_NODE_GAMMA' }
+        ];
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const fontSize = 14;
-const columns = canvas.width / fontSize;
-
-const drops = [];
-
-for(let x=0;x<columns;x++){
-    drops[x]=1;
-}
-
-function drawMatrix(){
-
-    ctx.fillStyle="rgba(2,6,23,0.08)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    ctx.fillStyle="#00ff88";
-    ctx.font=fontSize+"px monospace";
-
-    for(let i=0;i<drops.length;i++){
-
-        const text = letters.charAt(
-            Math.floor(Math.random()*letters.length)
-        );
-
-        ctx.fillText(
-            text,
-            i*fontSize,
-            drops[i]*fontSize
-        );
-
-        if(
-            drops[i]*fontSize > canvas.height &&
-            Math.random()>0.975
-        ){
-            drops[i]=0;
+        async function typeLog(text, color = "#00ff00") {
+            const p = document.createElement('p');
+            p.style.color = color;
+            terminal.appendChild(p);
+            
+            for (let i = 0; i < text.length; i++) {
+                p.innerHTML += text.charAt(i);
+                terminal.scrollTop = terminal.scrollHeight; // Auto-scroll
+                await sleep(20); // Typing speed
+            }
         }
 
-        drops[i]++;
-    }
-}
+        async function initiateHack() {
+            // Reset UI
+            terminal.innerHTML = '';
+            hackBtn.disabled = true;
+            hackBtn.innerText = "[ SEARCHING... ]";
 
-setInterval(drawMatrix,35);
+            servers.forEach(s => {
+                document.getElementById(s.id).innerText = `${s.name}: WAITING`;
+                document.getElementById(s.id).style.color = "#00ff00";
+                document.getElementById(s.id).style.borderColor = "#00ff00";
+            });
 
-/* SERVER LOGS */
+            await typeLog("> INITIATING HACK SEQUENCE...");
+            await sleep(500);
 
-const logs = [
-    "[+] Connecting to PW secure server...",
-    "[+] Changing proxy route...",
-    "[+] Server changed successfully...",
-    "[+] Starting uploaded file search...",
-    "[+] Extracting source code...",
-    "[+] Checking hidden uploads...",
-    "[+] Access token generated...",
-    "[+] Searching latest upload...",
-    "[+] File hash matched...",
-    "[+] Retry request sending...",
-    "[+] Waiting for upload response...",
-    "[!] Upload not detected...",
-    "[!] Uploaded file not found...",
-    "[!] Rechecking server database...",
-    "[+] Scanning encrypted folders...",
-    "[+] Searching backup servers...",
-    "[!] No uploaded content available..."
-];
+            for (let i = 0; i < servers.length; i++) {
+                let srv = servers[i];
+                let srvBox = document.getElementById(srv.id);
 
-function addLog(id){
+                await typeLog(`\n> -----------------------------------`);
+                await typeLog(`> TARGET LOCKED: ${srv.name}`);
+                
+                srvBox.innerText = `${srv.name}: CONNECTING`;
+                srvBox.style.color = "yellow";
+                srvBox.style.borderColor = "yellow";
+                
+                await typeLog(`> Extracting search code payload...`);
+                await sleep(600);
+                await typeLog(`> Injecting code into ${srv.name}...`);
+                await sleep(800);
 
-    const box = document.getElementById(id);
+                srvBox.innerText = `${srv.name}: SEARCHING`;
 
-    const div = document.createElement("div");
-    div.className = "log";
+                // Loading Spinner Animation
+                let loadElement = document.createElement('p');
+                loadElement.style.color = "cyan";
+                terminal.appendChild(loadElement);
+                
+                const frames = ['|', '/', '-', '\\'];
+                for (let j = 0; j < 15; j++) {
+                    loadElement.innerText = `> Scanning directories for uploaded files... ${frames[j % 4]}`;
+                    terminal.scrollTop = terminal.scrollHeight;
+                    await sleep(150);
+                }
 
-    div.innerText =
-        logs[Math.floor(Math.random()*logs.length)];
+                // Result for this server
+                await typeLog(`> [ERROR] FILE NOT FOUND IN DATABASE.`, "red");
+                await typeLog(`> STATUS: NOT UPLOADED YET`, "red");
+                
+                srvBox.innerText = `${srv.name}: NOT UPLOADED`;
+                srvBox.style.color = "red";
+                srvBox.style.borderColor = "red";
+                
+                await sleep(1000);
 
-    box.appendChild(div);
+                if (i < servers.length - 1) {
+                    await typeLog(`> Shifting IP and switching to next server...`, "yellow");
+                    await sleep(1000);
+                }
+            }
 
-    if(box.children.length > 14){
-        box.removeChild(box.children[0]);
-    }
+            await typeLog(`\n> -----------------------------------`);
+            await typeLog(`> SEARCH OPERATION COMPLETED.`, "cyan");
+            await typeLog(`> FINAL RESULT: NO FILES UPLOADED ON ANY SERVER. TRY AGAIN LATER.`, "cyan");
 
-    box.scrollTop = box.scrollHeight;
-}
-
-setInterval(()=>{
-    addLog("logs1");
-    addLog("logs2");
-    addLog("logs3");
-},1200);
-
-function restartLogs(){
-
-    document.getElementById("logs1").innerHTML="";
-    document.getElementById("logs2").innerHTML="";
-    document.getElementById("logs3").innerHTML="";
-}
-
-</script>
-
+            // Re-enable button
+            hackBtn.disabled = false;
+            hackBtn.innerText = "[ REFRESH & SEARCH AGAIN ]";
+        }
+    </script>
 </body>
 </html>
