@@ -1,67 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>PW DEEP SEARCH TERMINAL</title>
-    <style>
-        body { background: #0a0a0a; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; }
-        .grid-container { display: flex; gap: 15px; margin-bottom: 20px; }
-        .server { border: 2px solid #00ff41; padding: 15px; flex: 1; text-align: center; }
-        .status { font-weight: bold; margin-top: 10px; display: block; }
-        #terminal { border: 1px solid #333; padding: 15px; height: 300px; overflow-y: auto; background: #000; }
-        button { background: #004411; color: #00ff41; border: 1px solid #00ff41; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        button:hover { background: #00ff41; color: #000; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PW DEEP SEARCH TERMINAL</title>
+
+<style>
+    body {
+        background: #050505;
+        color: #00ff41;
+        font-family: 'Courier New', monospace;
+        padding: 20px;
+        overflow-x: hidden;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        text-shadow: 0 0 10px #00ff41;
+    }
+
+    .grid-container {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .server {
+        border: 2px solid #00ff41;
+        padding: 15px;
+        flex: 1;
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 0 10px #00ff41;
+    }
+
+    .status {
+        font-weight: bold;
+        margin-top: 10px;
+        display: block;
+    }
+
+    #terminal {
+        border: 1px solid #333;
+        padding: 15px;
+        height: 350px;
+        overflow-y: auto;
+        background: #000;
+        box-shadow: 0 0 15px #00ff41;
+    }
+
+    button {
+        background: #002b11;
+        color: #00ff41;
+        border: 1px solid #00ff41;
+        padding: 15px;
+        width: 100%;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #00ff41;
+        color: #000;
+    }
+
+    .danger {
+        animation: flash 0.2s infinite;
+    }
+
+    @keyframes flash {
+        0% {
+            background: #200;
+            box-shadow: 0 0 10px red;
+        }
+
+        50% {
+            background: #ff0000;
+            box-shadow: 0 0 30px red;
+        }
+
+        100% {
+            background: #200;
+            box-shadow: 0 0 10px red;
+        }
+    }
+
+    .file-detected {
+        color: #00ffff;
+        font-weight: bold;
+        text-shadow: 0 0 10px cyan;
+    }
+</style>
 </head>
 <body>
 
+<h1>PW DEEP SEARCH TERMINAL</h1>
+
 <div class="grid-container">
-    <div class="server" id="s1">MILESTONE-01<br><span class="status" id="st1">STANDBY</span></div>
-    <div class="server" id="s2">IDS-GATEWAY<br><span class="status" id="st2">STANDBY</span></div>
-    <div class="server" id="s3">FIREWALL-CORE<br><span class="status" id="st3">STANDBY</span></div>
+    <div class="server" id="s1">
+        MILESTONE-01
+        <br>
+        <span class="status" id="st1">STANDBY</span>
+    </div>
+
+    <div class="server" id="s2">
+        IDS-GATEWAY
+        <br>
+        <span class="status" id="st2">STANDBY</span>
+    </div>
+
+    <div class="server" id="s3">
+        FIREWALL-CORE
+        <br>
+        <span class="status" id="st3">STANDBY</span>
+    </div>
 </div>
 
 <div id="terminal"></div>
+
 <button onclick="startHack()">[ EXECUTE SEARCH SEQUENCE ]</button>
 
+<audio id="alarmSound">
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+</audio>
+
 <script>
-    const term = document.getElementById('terminal');
-    
-    function log(msg, color = "#00ff41") {
-        const p = document.createElement('p');
-        p.style.color = color;
-        p.innerHTML = `> ${msg}`;
-        term.appendChild(p);
-        term.scrollTop = term.scrollHeight;
-    }
 
-    async function startHack() {
-        term.innerHTML = ""; // Clear console
-        const servers = [1, 2, 3];
-        
-        log("ESTABLISHING ENCRYPTED TUNNEL...");
-        await new Promise(r => setTimeout(r, 1000));
+const term = document.getElementById('terminal');
+const alarm = document.getElementById('alarmSound');
 
-        for(let i of servers) {
-            document.getElementById(`st${i}`).innerText = "LOADING...";
-            log(`PINGING SERVER ${i}...`);
-            await new Promise(r => setTimeout(r, 800));
-            
-            // Simulating search
-            document.getElementById(`st${i}`).innerText = "SEARCHING...";
-            log(`SEARCHING FOR UPLOADED FILES ON SRV-${i}...`, "#ffff00");
-            
-            for(let j=0; j<5; j++) {
-                await new Promise(r => setTimeout(r, 400));
-                log(`PACKET_INDEX_${j}: NO MATCH FOUND`, "#555");
-            }
-            
-            document.getElementById(`st${i}`).innerText = "NOT FOUND";
-            log(`CRITICAL: NO FILES DETECTED ON SRV-${i}`, "red");
+function log(msg, color = '#00ff41') {
+    const p = document.createElement('p');
+    p.style.color = color;
+    p.innerHTML = '> ' + msg;
+    term.appendChild(p);
+    term.scrollTop = term.scrollHeight;
+}
+
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function startHack() {
+
+    term.innerHTML = '';
+
+    const servers = [1, 2, 3];
+
+    log('ESTABLISHING ENCRYPTED TUNNEL...');
+    await wait(1000);
+
+    for (let i of servers) {
+
+        document.getElementById(`st${i}`).innerText = 'LOADING...';
+
+        log(`PINGING SERVER ${i}...`);
+        await wait(800);
+
+        document.getElementById(`st${i}`).innerText = 'SEARCHING...';
+
+        log(`SEARCHING FOR UPLOADED FILES ON SRV-${i}...`, '#ffff00');
+
+        for (let j = 0; j < 5; j++) {
+            await wait(400);
+            log(`PACKET_INDEX_${j}: SCANNING...`, '#555');
         }
 
-        log("SEQUENCE FINISHED: NO DATA UPLOADED.", "cyan");
+        if (i === 2) {
+
+            document.getElementById(`st${i}`).innerText = 'FILE DETECTED';
+            document.getElementById(`s${i}`).classList.add('danger');
+
+            log('WARNING: UNKNOWN FILE DETECTED!', 'red');
+            await wait(700);
+
+            log('DECRYPTING METADATA...', '#00ffff');
+            await wait(1000);
+
+            log('ACCESS LINK FOUND:', '#00ffff');
+            log('https://drive.google.com/file/d/1IOPTgoaaOeZiWJgaD9oDzjOug8KKmr0P/view', '#00ffff');
+
+            alarm.play();
+
+            let sirenCount = 0;
+
+            const siren = setInterval(() => {
+                log('TIN TIN TIN TIN — SECURITY BREACH ALERT', 'red');
+                sirenCount++;
+
+                if (sirenCount > 10) {
+                    clearInterval(siren);
+                }
+            }, 500);
+
+            await wait(6000);
+
+        } else {
+
+            document.getElementById(`st${i}`).innerText = 'NOT FOUND';
+            log(`CRITICAL: NO FILES DETECTED ON SRV-${i}`, 'red');
+
+        }
     }
+
+    log('SEQUENCE FINISHED.', 'cyan');
+}
+
 </script>
+
 </body>
 </html>
