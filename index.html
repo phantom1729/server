@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PW DEEP SEARCH TERMINAL</title>
+<title>PW DEEP SEARCH TERMINAL - CRITICAL</title>
 
 <style>
     body {
@@ -12,6 +12,7 @@
         font-family: 'Courier New', monospace;
         padding: 20px;
         overflow-x: hidden;
+        transition: background 0.1s ease;
     }
 
     h1 {
@@ -33,6 +34,7 @@
         text-align: center;
         transition: 0.3s;
         box-shadow: 0 0 10px #00ff41;
+        background: rgba(0,0,0,0.8);
     }
 
     .status {
@@ -44,7 +46,7 @@
     #terminal {
         border: 1px solid #333;
         padding: 15px;
-        height: 350px;
+        height: 380px;
         overflow-y: auto;
         background: #000;
         box-shadow: 0 0 15px #00ff41;
@@ -60,38 +62,53 @@
         font-weight: bold;
         margin-top: 10px;
         transition: 0.3s;
+        font-size: 1.1rem;
+        letter-spacing: 2px;
     }
 
     button:hover {
         background: #00ff41;
         color: #000;
+        box-shadow: 0 0 20px #00ff41;
     }
 
+    /* System Wide Red Alert Animation */
     .danger {
-        animation: flash 0.2s infinite;
+        animation: flashServer 0.3s infinite;
     }
 
-    @keyframes flash {
-        0% {
-            background: #200;
-            box-shadow: 0 0 10px red;
-        }
+    @keyframes flashServer {
+        0% { background: #200; border-color: red; box-shadow: 0 0 15px red; color: red; }
+        50% { background: #ff0000; border-color: #fff; box-shadow: 0 0 30px red; color: #fff; }
+        100% { background: #200; border-color: red; box-shadow: 0 0 15px red; color: red; }
+    }
 
-        50% {
-            background: #ff0000;
-            box-shadow: 0 0 30px red;
-        }
+    /* Screen Flashing Effect for Background */
+    .screen-flash {
+        animation: emergencyFlash 0.2s infinite;
+    }
 
-        100% {
-            background: #200;
-            box-shadow: 0 0 10px red;
-        }
+    @keyframes emergencyFlash {
+        0% { background-color: #050505; }
+        50% { background-color: #400000; }
+        100% { background-color: #050505; }
     }
 
     .file-detected {
         color: #00ffff;
         font-weight: bold;
         text-shadow: 0 0 10px cyan;
+    }
+    
+    .critical-text {
+        font-weight: bold;
+        animation: textBlink 0.4s infinite;
+    }
+    
+    @keyframes textBlink {
+        0% { opacity: 1; }
+        50% { opacity: 0.3; }
+        100% { opacity: 1; }
     }
 </style>
 </head>
@@ -121,21 +138,25 @@
 
 <div id="terminal"></div>
 
-<button onclick="startHack()">[ EXECUTE SEARCH SEQUENCE ]</button>
+<button onclick="startHack()">[ EXECUTE DEEP SEARCH SEQUENCE ]</button>
 
-<audio id="alarmSound">
+<!-- High Intensity Alarm Sound -->
+<audio id="alarmSound" loop>
     <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
 </audio>
 
 <script>
-
 const term = document.getElementById('terminal');
 const alarm = document.getElementById('alarmSound');
+const body = document.body;
 
-function log(msg, color = '#00ff41') {
+function log(msg, color = '#00ff41', isCritical = false) {
     const p = document.createElement('p');
     p.style.color = color;
     p.innerHTML = '> ' + msg;
+    if (isCritical) {
+        p.classList.add('critical-text');
+    }
     term.appendChild(p);
     term.scrollTop = term.scrollHeight;
 }
@@ -145,70 +166,83 @@ function wait(ms) {
 }
 
 async function startHack() {
-
+    // Reset Terminal and Effects
     term.innerHTML = '';
+    body.classList.remove('screen-flash');
+    alarm.pause();
+    alarm.currentTime = 0;
+    
+    for(let id=1; id<=3; id++) {
+        document.getElementById(`st${id}`).innerText = 'STANDBY';
+        document.getElementById(`s${id}`).classList.remove('danger');
+    }
 
     const servers = [1, 2, 3];
 
-    log('ESTABLISHING ENCRYPTED TUNNEL...');
+    log('INITIALIZING DEEP SEARCH OVERRIDE...', '#00ff41');
     await wait(1000);
+    log('ESTABLISHING ENCRYPTED MULTI-NODE TUNNEL...', '#00ff41');
+    await wait(1200);
 
     for (let i of servers) {
-
         document.getElementById(`st${i}`).innerText = 'LOADING...';
-
-        log(`PINGING SERVER ${i}...`);
+        log(`PINGING SERVER GATEWAY [SRV-0${i}]...`);
         await wait(800);
 
         document.getElementById(`st${i}`).innerText = 'SEARCHING...';
-
-        log(`SEARCHING FOR UPLOADED FILES ON SRV-${i}...`, '#ffff00');
+        log(`PARSING FILESYSTEM SECTORS ON SRV-0${i}...`, '#ffff00');
 
         for (let j = 0; j < 5; j++) {
-            await wait(400);
-            log(`PACKET_INDEX_${j}: SCANNING...`, '#555');
+            await wait(300);
+            log(`PACKET_BLOCK_0${j}: ANALYZING SIGNATURES...`, '#555');
         }
 
         if (i === 2) {
-
-            document.getElementById(`st${i}`).innerText = 'FILE DETECTED';
+            // Trigger Critical Alert State
+            document.getElementById(`st${i}`).innerText = 'CRITICAL FILE DETECTED';
             document.getElementById(`s${i}`).classList.add('danger');
+            body.classList.add('screen-flash'); // Full screen flashing effect
 
-            log('WARNING: UNKNOWN FILE DETECTED!', 'red');
-            await wait(700);
-
-            log('DECRYPTING METADATA...', '#00ffff');
-            await wait(1000);
-
-            log('ACCESS LINK FOUND:', '#00ffff');
-            log('https://drive.google.com/file/d/1IOPTgoaaOeZiWJgaD9oDzjOug8KKmr0P/view', '#00ffff');
-
-            alarm.play();
+            log('🚨 WARNING: RESTRICTED DATA DETECTED ON NODE-02! 🚨', 'red', true);
+            
+            // Start the annoying loop alarm sound
+            alarm.play().catch(e => console.log("Audio play blocked until user interaction."));
 
             let sirenCount = 0;
-
             const siren = setInterval(() => {
-                log('TIN TIN TIN TIN — SECURITY BREACH ALERT', 'red');
+                log('!!! SECURITY BREACH ALERT !!! SYSTEM COMPROMISED !!!', 'red', true);
                 sirenCount++;
-
-                if (sirenCount > 10) {
+                if (sirenCount > 15) {
                     clearInterval(siren);
                 }
-            }, 500);
+            }, 400);
 
-            await wait(6000);
+            await wait(2000);
+            log('BYPASSING IDS ENCRYPTION LAYERS...', '#00ffff');
+            await wait(1500);
+            log('DECRYPTING target_metadata.dat...', '#00ffff');
+            await wait(1500);
+
+            log('==================================================', '#00ffff');
+            log('ACCESS LINK EXTRACTED SUCCESSFULLY:', '#00ffff');
+            log('<a href="https://drive.google.com/file/d/1GyQIks3j0PD63sq0W1A_tQ-kwHGdIVon/view?usp=drivesdk" target="_blank" style="color: #ffffff; font-weight: bold; text-decoration: underline;">👉 CLICK HERE TO ACCESS DRIVE FILE 👈</a>', '#fff');
+            log('==================================================', '#00ffff');
+
+            await wait(4000);
+            
+            // Stop background flash after data leak simulation is complete
+            body.classList.remove('screen-flash');
+            alarm.pause();
 
         } else {
-
-            document.getElementById(`st${i}`).innerText = 'NOT FOUND';
-            log(`CRITICAL: NO FILES DETECTED ON SRV-${i}`, 'red');
-
+            document.getElementById(`st${i}`).innerText = 'CLEAN';
+            log(`STATUS: NO TARGET SIGNATURES DETECTED ON SRV-0${i}`, '#ff3333');
+            await wait(600);
         }
     }
 
-    log('SEQUENCE FINISHED.', 'cyan');
+    log('DEEP SEARCH SEQUENCE COMPLETED.', 'cyan');
 }
-
 </script>
 
 </body>
